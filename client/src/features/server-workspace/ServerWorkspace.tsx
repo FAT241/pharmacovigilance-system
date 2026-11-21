@@ -29,10 +29,34 @@ function PatientProfile({ token, onExpired }: { token: string; onExpired: () => 
   </Card>
 }
 
+const SESSION_KEY = 'dacs4_active_session'
+
 export function ServerWorkspace() {
-  const [session, setSession] = useState<Session>()
-  const endSession = () => setSession(undefined)
-  if (!session) return <ServerLogin onLogin={setSession} />
+  const [session, setSession] = useState<Session | undefined>(() => {
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY)
+      if (stored) return JSON.parse(stored) as Session
+    } catch {
+      // Bỏ qua lỗi parse
+    }
+    return undefined
+  })
+
+  const updateSession = (newSession: Session | undefined) => {
+    setSession(newSession)
+    try {
+      if (newSession) {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(newSession))
+      } else {
+        sessionStorage.removeItem(SESSION_KEY)
+      }
+    } catch {
+      // Bỏ qua lỗi storage
+    }
+  }
+
+  const endSession = () => updateSession(undefined)
+  if (!session) return <ServerLogin onLogin={updateSession} />
 
   const { account, token } = session
   const admin = account.role === 'ADMIN'
