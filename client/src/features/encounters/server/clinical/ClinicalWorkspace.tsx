@@ -30,6 +30,7 @@ import {
   WarningOutlined,
   QuestionCircleOutlined,
   ExperimentOutlined,
+  ExclamationCircleFilled,
 } from '@ant-design/icons'
 import { ApiError, requestApi } from '../../../server-workspace/api'
 import { ClinicalOverview } from './ClinicalOverview'
@@ -151,6 +152,35 @@ export function ClinicalWorkspace({
 
   const activeOrdersCount = record?.orders.filter((o) => o.status === 'ACTIVE').length || 0
   const pendingReviewCount = record?.reconciliation.filter((r) => r.decision === 'PENDING').length || 0
+
+  // Active Pharmacovigilance calculations
+  const activeOrders = record?.orders.filter((o) => o.status === 'ACTIVE') || []
+  const isTakingAmlo = activeOrders.some((o) => {
+    const n = o.medication.name.toLowerCase()
+    return n.includes('amlo') || n.includes('amlor')
+  })
+  const isTakingAcei = activeOrders.some((o) => {
+    const n = o.medication.name.toLowerCase()
+    return n.includes('enalapril') || n.includes('renitec')
+  })
+  const isTakingStatin = activeOrders.some((o) => {
+    const n = o.medication.name.toLowerCase()
+    return n.includes('atorvastatin') || n.includes('lipitor')
+  })
+
+  const allNotesText = (record?.progressNotes || []).map((p) => p.body.toLowerCase()).join(' ')
+  const hasEdema = allNotesText.includes('phù') || allNotesText.includes('sưng chân') || allNotesText.includes('edema')
+  const hasCough = allNotesText.includes('ho khan') || allNotesText.includes('ho kéo dài')
+  const hasMyalgia = allNotesText.includes('đau cơ') || allNotesText.includes('mỏi cơ')
+
+  const initialWeight = record && record.weights.length > 0 ? Number(record.weights[record.weights.length - 1].kilograms) : null
+  const currentWeight = record && record.weights.length > 0 ? Number(record.weights[0].kilograms) : null
+  const weightGain = initialWeight && currentWeight ? Number((currentWeight - initialWeight).toFixed(1)) : 0
+  const hasWeightGainAmlo = isTakingAmlo && weightGain >= 2
+
+  const hasAmloEdema = isTakingAmlo && (hasEdema || hasWeightGainAmlo)
+  const hasAceiCough = isTakingAcei && hasCough
+  const hasStatinMyo = isTakingStatin && hasMyalgia
 
   return (
     <div className="clinical-workspace-root page-entrance" style={{ display: 'grid', gap: 16 }}>
@@ -291,6 +321,37 @@ export function ClinicalWorkspace({
             {/* Clinical Alerts / Allergies / Diagnoses Tags */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                {hasAmloEdema && (
+                  <Tag
+                    color="error"
+                    icon={<ExclamationCircleFilled />}
+                    style={{ fontWeight: 600, cursor: 'pointer', border: '1px solid #f87171' }}
+                    onClick={() => setTab('summary')}
+                  >
+                    🚨 Nghi ngờ ADR: Phù ngoại vi (Amlodipine) {weightGain >= 2 ? `(+${weightGain}kg)` : ''}
+                  </Tag>
+                )}
+                {hasAceiCough && (
+                  <Tag
+                    color="warning"
+                    icon={<ExclamationCircleFilled />}
+                    style={{ fontWeight: 600, cursor: 'pointer', border: '1px solid #fde68a' }}
+                    onClick={() => setTab('summary')}
+                  >
+                    ⚠️ Nghi ngờ ADR: Ho khan (Enalapril)
+                  </Tag>
+                )}
+                {hasStatinMyo && (
+                  <Tag
+                    color="warning"
+                    icon={<ExclamationCircleFilled />}
+                    style={{ fontWeight: 600, cursor: 'pointer', border: '1px solid #fde68a' }}
+                    onClick={() => setTab('summary')}
+                  >
+                    ⚠️ Nghi ngờ ADR: Đau cơ (Atorvastatin)
+                  </Tag>
+                )}
+
                 {record.allergyStatus === 'REPORTED' ? (
                   <Tag color="error" icon={<WarningOutlined />} style={{ fontWeight: 600 }}>
                     Có dị ứng: {record.allergens.map((a) => a.name).join(', ') || 'Đã ghi nhận'}

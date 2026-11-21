@@ -25,7 +25,9 @@ const medication = z.object({
   path: ['ingredients'], message: 'Hoạt chất bị trùng.',
 }).refine(data => !!data.referenceSource === !!data.referenceText, { message: 'Cần có cả tên nguồn và trích đoạn đã kiểm tra.' })
 
-const include = { activeIngredients: { include: { ingredient: true } }, allergens: true, groups: true } as const
+const include = { activeIngredients: { include: { ingredient: true } }, allergens: true, groups: true,
+  _count: { select: { orders: true, homeMedications: true } },
+} as const
 
 function withGroupCodes<T extends { groups: { code: string }[] }>(row: T) {
   return { ...row, groupCodes: row.groups.map(g => g.code) }

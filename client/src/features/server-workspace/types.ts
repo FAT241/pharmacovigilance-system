@@ -14,6 +14,7 @@ export type PatientRow = {
 }
 
 export type MedicationRow = {
+  _count?: { orders: number; homeMedications: number }
   groups: { code: string; name: string }[]
   referenceSource: string | null
   referenceText: string | null

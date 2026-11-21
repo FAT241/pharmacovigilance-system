@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Alert, App, Button, Card, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag } from 'antd'
+import { App, Button, Card, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
 import { GroupCatalog, type DrugGroup } from './GroupCatalog'
 import { ApiError, requestApi } from './api'
@@ -20,14 +20,17 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
   const [groups, setGroups] = useState<DrugGroup[]>([])
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [editing, setEditing] = useState<MedicationRow | null>()
-  const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [form] = Form.useForm<Fields>()
 
   function report(cause: unknown) {
     if (cause instanceof ApiError && cause.status === 401) onExpired()
-    else setError(cause instanceof Error ? cause.message : 'Không thể kết nối máy chủ.')
+    else modal.error({
+      title: 'Không thể hoàn tất thao tác',
+      content: cause instanceof Error ? cause.message : 'Không thể kết nối máy chủ.',
+      okText: 'Đóng',
+    })
   }
 
   useEffect(() => {
@@ -47,7 +50,6 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
   }, [token])
 
   function open(row: MedicationRow | null) {
-    setError('')
     setEditing(row)
   }
 
@@ -58,7 +60,6 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
   }
 
   async function save(values: Fields) {
-    setError('')
     setBusy(true)
     try {
       replace(await requestApi<MedicationRow>(editing ? '/medications/' + editing.id : '/medications',
@@ -74,7 +75,10 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
       title: row.active ? 'Ngừng sử dụng ' + row.name : 'Kích hoạt ' + row.name,
       okText: 'Xác nhận', cancelText: 'Hủy',
       onOk: async () => {
-        try { replace(await requestApi<MedicationRow>('/medications/' + row.id + '/status', token, 'PATCH', { active: !row.active })) }
+        try {
+          replace(await requestApi<MedicationRow>('/medications/' + row.id + '/status', token, 'PATCH', { active: !row.active }))
+          message.success(row.active ? 'Đã ngừng sử dụng ' + row.name + '.' : 'Đã kích hoạt ' + row.name + '.')
+        }
         catch (cause) { report(cause) }
       },
     })
@@ -83,7 +87,7 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
   async function deleteMedication(row: MedicationRow) {
     try {
       await requestApi('/medications/' + row.id, token, 'DELETE')
-      setRows(rows.filter(r => r.id !== row.id))
+      setRows(previous => previous.filter(r => r.id !== row.id))
       message.success('Đã xóa thuốc ' + row.name + ' khỏi danh mục.')
     } catch (cause) {
       report(cause)
@@ -95,7 +99,6 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
     {!readOnly && <Button onClick={() => setCatalogOpen(true)}>Nhóm dược lý</Button>}
     {catalogOpen && <GroupCatalog groups={groups} token={token} onClose={() => setCatalogOpen(false)} onExpired={onExpired}
       onSave={updated => setGroups(old => [...old.filter(g => g.code !== updated.code), updated].sort((a, b) => a.name.localeCompare(b.name, 'vi')))} />}
-    {error && editing === undefined && <Alert type="error" showIcon message={error} />}
     <Input.Search style={{ maxWidth: 430, marginBlock: 12, display: 'block' }} allowClear aria-label="Tìm thuốc" placeholder="Tên thuốc, mã, hoạt chất hoặc nhóm" value={query} onChange={e => setQuery(e.target.value)} />
     <Table<MedicationRow>
       rowKey="id"
@@ -132,7 +135,8 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
         <Space wrap>
           <Button onClick={() => open(row)}>Sửa</Button>
           <Button danger={row.active} onClick={() => confirmStatus(row)}>{row.active ? 'Ngừng sử dụng' : 'Kích hoạt'}</Button>
-          <Popconfirm
+          {(row._count?.orders || row._count?.homeMedications) ?
+            <span>Đã có trong hồ sơ điều trị</span> : <Popconfirm
             title="Xóa thuốc khỏi danh mục"
             description={`Bạn có chắc muốn xóa thuốc "${row.name}"?`}
             okText="Xóa"
@@ -141,12 +145,11 @@ export function Medications({ token, onExpired, readOnly }: { token: string; onE
             onConfirm={() => deleteMedication(row)}
           >
             <Button danger icon={<DeleteOutlined />}>Xóa</Button>
-          </Popconfirm>
+          </Popconfirm>}
         </Space> }] : []),
     ]} />
     {editing !== undefined && <Modal open title={editing ? 'Sửa thuốc' : 'Thêm thuốc'} okText="Lưu thuốc" cancelText="Hủy"
       confirmLoading={busy} onOk={() => form.submit()} onCancel={() => { if (!busy) setEditing(undefined) }}>
-      {error && <Alert type="error" showIcon message={error} />}
       <Form form={form} preserve={false} layout="vertical" onFinish={save} initialValues={editing
         ? { ...editing, groupCodes: editing.groups.map(g => g.code), referenceSource: editing.referenceSource ?? '', referenceText: editing.referenceText ?? '', allergenCodes: editing.allergens.map(a => a.code), ingredients: editing.activeIngredients.map(item => ({ name: item.ingredient.name, amount: Number(item.amount) })) }
         : { baseUnit: 'TABLET', ingredients: [{}] }}>
