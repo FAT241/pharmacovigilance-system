@@ -19,6 +19,12 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 
+function formatNum(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') return '—'
+  const num = Number(value)
+  return isNaN(num) ? String(value) : num.toString()
+}
+
 export function ClinicalOverview({
   data,
   editable,
@@ -67,7 +73,7 @@ export function ClinicalOverview({
               <BloodPressureIcon size={22} color="#dc2626" />
             </div>
             <div style={{ marginTop: 8, fontSize: 22, fontWeight: 700, color: '#dc2626' }}>
-              {sysBp && diaBp ? `${sysBp.value}/${diaBp.value}` : sysBp ? `${sysBp.value}` : '—'}
+              {sysBp && diaBp ? `${formatNum(sysBp.value)}/${formatNum(diaBp.value)}` : sysBp ? `${formatNum(sysBp.value)}` : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>mmHg</span>
             </div>
             <div style={{ fontSize: 11, color: sysBp ? '#059669' : '#0284c7', marginTop: 4 }}>
@@ -90,7 +96,7 @@ export function ClinicalOverview({
               <HeartbeatPulseIcon size={24} color="#e11d48" animated={Boolean(heartRate)} />
             </div>
             <div style={{ marginTop: 8, fontSize: 22, fontWeight: 700, color: '#e11d48' }}>
-              {heartRate ? heartRate.value : '—'}
+              {heartRate ? formatNum(heartRate.value) : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>lần/phút</span>
             </div>
             <div style={{ fontSize: 11, color: heartRate ? '#059669' : '#0284c7', marginTop: 4 }}>
@@ -113,7 +119,7 @@ export function ClinicalOverview({
               <BloodGlucoseIcon size={22} color="#d97706" />
             </div>
             <div style={{ marginTop: 8, fontSize: 22, fontWeight: 700, color: '#d97706' }}>
-              {glucose ? glucose.value : '—'}
+              {glucose ? formatNum(glucose.value) : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>{glucose?.unit || 'mmol/L'}</span>
             </div>
             <div style={{ fontSize: 11, color: glucose ? '#059669' : '#0284c7', marginTop: 4 }}>
@@ -136,16 +142,16 @@ export function ClinicalOverview({
               <WeightScaleIcon size={22} color="#0284c7" />
             </div>
             <div style={{ marginTop: 8, fontSize: 22, fontWeight: 700, color: '#0284c7' }}>
-              {latestWeight ? latestWeight.kilograms : '—'}
+              {latestWeight ? formatNum(latestWeight.kilograms) : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>kg</span>
               {creatinine && (
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#0369a1', marginLeft: 10 }}>
-                  · Cr {creatinine.value}
+                  · Cr {formatNum(creatinine.value)}
                 </span>
               )}
             </div>
             <div style={{ fontSize: 11, color: latestWeight ? '#059669' : '#0284c7', marginTop: 4 }}>
-              {latestWeight ? `Cân lúc nhập viện (${latestWeight.kilograms} kg)` : '+ Nhấp để nhập cân nặng'}
+              {latestWeight ? `Cân lúc nhập viện (${formatNum(latestWeight.kilograms)} kg)` : '+ Nhấp để nhập cân nặng'}
             </div>
           </Card>
         </Col>

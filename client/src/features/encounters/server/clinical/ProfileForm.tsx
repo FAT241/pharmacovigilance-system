@@ -34,8 +34,8 @@ export function ProfileForm({ data, editable, onSave }: { data: ClinicalData; ed
       <InputNumber min={0.01} max={9999.99} precision={2} addonAfter="kg" />
     </Form.Item>}
     {record.weights.length > 0 && <details style={{ marginBottom: 14 }}>
-      <summary><HeartOutlined /> Cân nặng gần nhất · {record.weights[0].kilograms} kg</summary>
-      <ul>{record.weights.map(w => <li key={w.id}>{new Date(w.measuredAt).toLocaleString('vi-VN')} · {w.kilograms} kg</li>)}</ul>
+      <summary><HeartOutlined /> Cân nặng gần nhất · {Number(record.weights[0].kilograms)} kg</summary>
+      <ul>{record.weights.map(w => <li key={w.id}>{new Date(w.measuredAt).toLocaleString('vi-VN')} · {Number(w.kilograms)} kg</li>)}</ul>
     </details>}
     <Space>{editable && <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>Lưu hồ sơ</Button>}
       {!editable && <Typography.Text type="secondary">Hồ sơ ở chế độ xem.</Typography.Text>}</Space>

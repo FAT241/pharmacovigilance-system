@@ -4,6 +4,12 @@ import { HeartOutlined, SaveOutlined } from '@ant-design/icons'
 import type { ClinicalData, SaveChange } from './types'
 import { BloodGlucoseIcon, BloodPressureIcon, HeartbeatPulseIcon, KidneyIcon } from '../../../../shared/components/MedicalIcons'
 
+function formatObservationValue(value: string | number): string {
+  if (value === null || value === undefined || value === '') return '—'
+  const num = Number(value)
+  return isNaN(num) ? String(value) : num.toString()
+}
+
 export function Measurements({ data, editable, onSave }: { data: ClinicalData; editable: boolean; onSave: SaveChange }) {
   const [form] = Form.useForm()
   const [saving, setSaving] = useState(false)
@@ -169,7 +175,7 @@ export function Measurements({ data, editable, onSave }: { data: ClinicalData; e
                 description={new Date(row.measuredAt).toLocaleString('vi-VN')}
               />
               <Tag color="blue" style={{ fontSize: 14, padding: '4px 10px', fontWeight: 600 }}>
-                {row.value} {row.unit}
+                {formatObservationValue(row.value)} {row.unit}
               </Tag>
             </List.Item>
           )}
