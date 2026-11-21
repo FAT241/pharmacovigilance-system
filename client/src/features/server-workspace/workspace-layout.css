@@ -1,17 +1,19 @@
 .ward-workspace {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   color: #0f172a;
   background: #f1f5f9;
 }
 
 .ward-nav.ant-layout-sider {
   border-inline-end: 1px solid #e2e8f0;
-  position: sticky;
-  top: 0;
   height: 100vh;
+  max-height: 100vh;
   box-shadow: 2px 0 12px rgba(15, 23, 42, 0.03);
   background: #ffffff;
   z-index: 20;
+  flex-shrink: 0;
 }
 
 .ward-nav .ant-layout-sider-children {
@@ -100,6 +102,10 @@
 
 .ward-body {
   min-width: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: #f8fafc;
 }
 
