@@ -113,39 +113,76 @@ export function RecordsTable<Row extends { id: string }>({
 
   const actions: ColumnsType<Row> = editPath || statusChange || deletePath ? [{
     title: 'Thao tác',
+    width: 140,
     render: (_, row) => {
       const change = statusChange?.(row)
       const delPath = deletePath?.(row)
-      return <Space wrap>
-        {editPath?.(row) && <Button icon={<EditOutlined />} onClick={() => openEditor(row)}>Sửa</Button>}
-        {change && <Button danger={!change.active} onClick={() => {
-          setIssue('')
-          setReason('')
-          setStatus(change)
-        }}>{change.active ? 'Kích hoạt' : 'Vô hiệu hóa'}</Button>}
-        {delPath && (
-          <Popconfirm
-            title="Xác nhận xóa"
-            description="Bạn có chắc chắn muốn xóa bản ghi này khỏi hệ thống?"
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-            onConfirm={() => deleteRow(delPath)}
-          >
-            <Button danger icon={<DeleteOutlined />}>Xóa</Button>
-          </Popconfirm>
-        )}
-      </Space>
+      return (
+        <Space size="small" wrap>
+          {editPath?.(row) && (
+            <Button size="small" icon={<EditOutlined />} onClick={() => openEditor(row)}>
+              Sửa
+            </Button>
+          )}
+          {change && (
+            <Button
+              size="small"
+              danger={!change.active}
+              onClick={() => {
+                setIssue('')
+                setReason('')
+                setStatus(change)
+              }}
+            >
+              {change.active ? 'Kích hoạt' : 'Vô hiệu hóa'}
+            </Button>
+          )}
+          {delPath && (
+            <Popconfirm
+              title="Xác nhận xóa"
+              description="Bạn có chắc chắn muốn xóa bản ghi này khỏi hệ thống?"
+              okText="Xóa"
+              cancelText="Hủy"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => deleteRow(delPath)}
+            >
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                Xóa
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
+      )
     },
   }] : []
 
   return (
-    <Card>
+    <Card style={{ borderRadius: 10, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(15,23,42,0.03)' }}>
       <Space wrap style={{ marginBottom: 16 }}>
-        {searchText && <Input prefix={<SearchOutlined />} aria-label={searchLabel} placeholder={searchHint}
-          allowClear value={query} onChange={event => setQuery(event.target.value)} />}
-        {createPath && <Button icon={<PlusOutlined />} type="primary" onClick={() => openEditor(null)}>{createLabel}</Button>}
-        <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>Tải lại</Button>
+        {searchText && (
+          <Input
+            prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+            aria-label={searchLabel}
+            placeholder={searchHint}
+            allowClear
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            style={{ minWidth: 280, borderRadius: 6 }}
+          />
+        )}
+        {createPath && (
+          <Button
+            icon={<PlusOutlined />}
+            type="primary"
+            style={{ background: '#0284c7', borderColor: '#0284c7', borderRadius: 6, fontWeight: 500 }}
+            onClick={() => openEditor(null)}
+          >
+            {createLabel}
+          </Button>
+        )}
+        <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading} style={{ borderRadius: 6 }}>
+          Làm mới
+        </Button>
       </Space>
       {issue && editing === undefined && !status && <Alert type="error" showIcon message={issue} />}
       <Table rowKey="id" dataSource={searchText && query.trim()

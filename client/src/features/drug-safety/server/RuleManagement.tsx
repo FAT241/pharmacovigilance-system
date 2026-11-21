@@ -358,7 +358,7 @@ export function RuleManagement({ token, onExpired }: { token: string; onExpired:
         />
       </Card>
 
-      <Card title="Nhật ký thay đổi luật (Audit Trail Socket.IO)">
+      <Card title="Lịch sử cập nhật luật an toàn">
         <List
           loading={loading}
           dataSource={logs.rows}

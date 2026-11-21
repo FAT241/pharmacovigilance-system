@@ -94,7 +94,7 @@ export function ServerLogin({ onLogin }: { onLogin: (session: Session) => void }
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,0.1)', padding: '12px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)' }}>
                   <ThunderboltOutlined style={{ color: '#fbbf24', fontSize: 20 }} />
-                  <span style={{ color: '#ffffff', fontSize: 13.5, fontWeight: 500 }}>Tạm ngưng luật khẩn cấp Socket.IO đồng bộ thời gian thực đến toàn viện</span>
+                  <span style={{ color: '#ffffff', fontSize: 13.5, fontWeight: 500 }}>Tạm ngưng luật khẩn cấp và cảnh báo đồng bộ tức thời</span>
                 </div>
               </div>
             </div>
