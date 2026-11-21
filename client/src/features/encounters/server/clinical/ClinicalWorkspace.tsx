@@ -207,7 +207,7 @@ export function ClinicalWorkspace({
             <>
               <Button
                 type="primary"
-                icon={<MedicineBoxOutlined />}
+                icon={<img src="/images/nav-meds.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 4 }} alt="" />}
                 onClick={() => setTab('orders')}
                 style={{ background: '#0284c7' }}
               >
@@ -334,7 +334,7 @@ export function ClinicalWorkspace({
                   key: 'summary',
                   label: (
                     <span>
-                      <DashboardOutlined /> Tổng quan
+                      <img src="/images/nav-patient.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Tổng quan
                     </span>
                   ),
                   children: (
@@ -350,7 +350,7 @@ export function ClinicalWorkspace({
                   key: 'profile',
                   label: (
                     <span>
-                      <FileTextOutlined /> Lâm sàng & Tiền sử
+                      <img src="/images/nav-profile.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Lâm sàng & Tiền sử
                     </span>
                   ),
                   children: <ProfileForm data={data} editable={editable} onSave={save} />,
@@ -359,7 +359,7 @@ export function ClinicalWorkspace({
                   key: 'measurements',
                   label: (
                     <span>
-                      <HeartbeatPulseIcon size={16} /> Sinh hiệu & Xét nghiệm
+                      <img src="/images/icon-vitals.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Sinh hiệu & Xét nghiệm
                     </span>
                   ),
                   children: <Measurements data={data} editable={editable} onSave={save} />,
@@ -369,7 +369,7 @@ export function ClinicalWorkspace({
                   label: (
                     <span>
                       <Badge count={pendingReviewCount} size="small" offset={[6, 0]}>
-                        <ExperimentOutlined /> Đối chiếu thuốc tại nhà
+                        <img src="/images/icon-bottle.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Đối chiếu thuốc tại nhà
                       </Badge>
                     </span>
                   ),
@@ -380,7 +380,7 @@ export function ClinicalWorkspace({
                   label: (
                     <span>
                       <Badge count={activeOrdersCount} size="small" offset={[6, 0]} color="#0284c7">
-                        <MedicineBoxOutlined /> Y lệnh & Kê đơn thuốc
+                        <img src="/images/nav-meds.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Y lệnh & Kê đơn thuốc
                       </Badge>
                     </span>
                   ),
@@ -399,7 +399,7 @@ export function ClinicalWorkspace({
                   key: 'history',
                   label: (
                     <span>
-                      <SafetyCertificateOutlined /> Đánh giá & Lịch sử cảnh báo
+                      <img src="/images/nav-rules.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Đánh giá & Lịch sử cảnh báo
                     </span>
                   ),
                   children: tab === 'history' && (
@@ -417,7 +417,7 @@ export function ClinicalWorkspace({
                   key: 'publication',
                   label: (
                     <span>
-                      <CommentOutlined /> Dặn dò & Xuất viện
+                      <img src="/images/nav-treatment.gif" width={18} height={18} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Dặn dò & Xuất viện
                     </span>
                   ),
                   children: <Publication record={data.record} editable={editable} onSave={save} />,

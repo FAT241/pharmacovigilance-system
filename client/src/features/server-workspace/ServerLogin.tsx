@@ -133,7 +133,7 @@ export function ServerLogin({ onLogin }: { onLogin: (session: Session) => void }
                 key: 'staff',
                 label: (
                   <span>
-                    <MedicineBoxOutlined /> Bác sĩ / Quản trị
+                    <img src="/images/nav-patient.gif" width={20} height={20} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Bác sĩ / Quản trị
                   </span>
                 ),
                 children: (
@@ -173,7 +173,7 @@ export function ServerLogin({ onLogin }: { onLogin: (session: Session) => void }
                 key: 'patient',
                 label: (
                   <span>
-                    <IdcardOutlined /> Bệnh nhân
+                    <img src="/images/nav-treatment.gif" width={20} height={20} style={{ verticalAlign: 'middle', marginRight: 6 }} alt="" /> Bệnh nhân
                   </span>
                 ),
                 children: (

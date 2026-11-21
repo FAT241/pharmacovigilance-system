@@ -258,6 +258,22 @@ button, input, textarea {
   width: calc(100% - 16px) !important;
 }
 
+.nav-animated-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ant-menu-item:hover .nav-animated-icon {
+  transform: scale(1.18);
+}
+
+.ant-menu-item-selected .nav-animated-icon {
+  transform: scale(1.12);
+  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.4));
+}
+
 /* Stat card gradient accent bars */
 .stat-card-accent {
   position: relative;

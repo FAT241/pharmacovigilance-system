@@ -31,6 +31,32 @@ function PatientProfile({ token, onExpired }: { token: string; onExpired: () => 
 
 const SESSION_KEY = 'dacs4_active_session'
 
+const NavIcon = ({ src, alt }: { src: string; alt: string }) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 26,
+      height: 26,
+      borderRadius: 6,
+      verticalAlign: 'middle',
+      marginRight: 4,
+    }}
+  >
+    <img
+      src={src}
+      alt={alt}
+      width={24}
+      height={24}
+      style={{
+        objectFit: 'contain',
+        display: 'block',
+      }}
+    />
+  </span>
+)
+
 export function ServerWorkspace() {
   const [session, setSession] = useState<Session | undefined>(() => {
     try {
@@ -61,14 +87,14 @@ export function ServerWorkspace() {
   const { account, token } = session
   const admin = account.role === 'ADMIN'
   const sections = account.role === 'PATIENT' ? [
-    { key: 'treatment', label: 'Điều trị của tôi', icon: <MedicineBoxOutlined />, content: <PatientTreatment token={token} onExpired={endSession} /> },
-    { key: 'profile', label: 'Hồ sơ của tôi', icon: <FileTextOutlined />, content: <PatientProfile token={token} onExpired={endSession} /> },
+    { key: 'treatment', label: 'Điều trị của tôi', icon: <NavIcon src="/images/nav-treatment.gif" alt="Điều trị" />, content: <PatientTreatment token={token} onExpired={endSession} /> },
+    { key: 'profile', label: 'Hồ sơ của tôi', icon: <NavIcon src="/images/nav-profile.gif" alt="Hồ sơ" />, content: <PatientProfile token={token} onExpired={endSession} /> },
   ] : [
-    { key: 'patients', label: 'Hồ sơ bệnh nhân', icon: <ContactsOutlined />, content: <Patients token={token} onExpired={endSession} doctorId={admin ? undefined : account.id} /> },
-    { key: 'medications', label: 'Danh mục thuốc', icon: <MedicineBoxOutlined />, content: <Medications token={token} onExpired={endSession} readOnly={!admin} /> },
+    { key: 'patients', label: 'Hồ sơ bệnh nhân', icon: <NavIcon src="/images/nav-patient.gif" alt="Bệnh nhân" />, content: <Patients token={token} onExpired={endSession} doctorId={admin ? undefined : account.id} /> },
+    { key: 'medications', label: 'Danh mục thuốc', icon: <NavIcon src="/images/nav-meds.gif" alt="Thuốc" />, content: <Medications token={token} onExpired={endSession} readOnly={!admin} /> },
     ...(admin ? [
-      { key: 'accounts', label: 'Tài khoản', icon: <TeamOutlined />, content: <Accounts token={token} onExpired={endSession} /> },
-      { key: 'rules', label: 'Luật cảnh báo', icon: <SafetyOutlined />, content: <RuleManagement token={token} onExpired={endSession} /> },
+      { key: 'accounts', label: 'Tài khoản', icon: <NavIcon src="/images/nav-accounts.gif" alt="Tài khoản" />, content: <Accounts token={token} onExpired={endSession} /> },
+      { key: 'rules', label: 'Luật cảnh báo', icon: <NavIcon src="/images/nav-rules.gif" alt="Luật cảnh báo" />, content: <RuleManagement token={token} onExpired={endSession} /> },
     ] : []),
   ]
   return <WorkspaceShell sections={sections} account={account} token={token} onLogout={endSession} />
