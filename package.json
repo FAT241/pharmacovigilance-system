@@ -1,0 +1,28 @@
+{
+  "name": "dacs4",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "ai:install": "powershell -NoProfile -ExecutionPolicy RemoteSigned -File scripts/install-local-ai.ps1",
+    "start": "node --env-file=.env scripts/start-desktop.cjs",
+    "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:desktop\"",
+    "dev:server": "npm run dev -w @dacs4/server",
+    "dev:desktop": "npm run dev -w @dacs4/client",
+    "desktop": "npm run desktop -w @dacs4/client --",
+    "package:client": "node scripts/package-client.cjs",
+    "host:online": "cmd /c scripts\\start-host-online.bat",
+    "build": "npm run build --workspaces",
+    "db:up": "docker compose up -d",
+    "db:generate": "prisma generate --schema server/prisma/schema.prisma",
+    "db:migrate": "prisma migrate deploy --schema server/prisma/schema.prisma",
+    "db:seed": "npm run db:seed -w @dacs4/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9",
+    "prisma": "^6",
+    "typescript": "^5"
+  }
+}

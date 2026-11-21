@@ -1,0 +1,299 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid #1677ff;
+  outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.18); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  70% { transform: scale(1); }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(22, 119, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0);
+  }
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(82, 196, 26, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0);
+  }
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 77, 79, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes eye-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Helper Animation Classes */
+.heartbeat-anim {
+  animation: heartbeat 1.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.pulse-live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #52c41a;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-green 1.8s infinite;
+}
+
+.pulse-alert-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d4f;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-red 1.6s infinite;
+}
+
+.ai-pulse-container {
+  animation: float-slow 3.2s ease-in-out infinite;
+}
+
+.ai-eye-blink {
+  animation: eye-blink 3s infinite;
+  transform-origin: center;
+}
+
+.page-entrance {
+  animation: fade-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glassmorphism & Elevation Tokens */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+.card-hover-lift {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -4px rgba(16, 24, 40, 0.08), 0 4px 10px -2px rgba(16, 24, 40, 0.04) !important;
+}
+
+/* Ant Design Component Enhancements */
+.ant-layout {
+  min-width: 0;
+}
+
+.clinical-header {
+  height: auto;
+  min-height: 68px;
+  line-height: 1.5;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-block: 10px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e5edf5 !important;
+  box-shadow: 0 2px 10px rgba(9, 88, 217, 0.04);
+}
+
+.clinical-header > div:first-child {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.clinical-header > .ant-space {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+.clinical-content {
+  min-width: 0;
+  animation: fade-slide-up 0.25s ease-out;
+}
+
+.ant-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ant-table-thead > tr > th {
+  white-space: nowrap;
+  background: #f4f8fc !important;
+  color: #334e68 !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #d9e6f2 !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f0f7ff !important;
+  transition: background 0.15s ease;
+}
+
+.ant-card {
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f4f8 !important;
+  font-weight: 600;
+}
+
+.ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.25) !important;
+}
+.ant-btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.ant-tag {
+  border-radius: 4px;
+  font-weight: 500;
+  padding: 1px 8px;
+}
+
+.ant-modal-content {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+.ant-menu-light.ant-menu-inline .ant-menu-item-selected {
+  font-weight: 600;
+  background: #e6f4ff !important;
+  border-radius: 8px;
+}
+
+.ant-menu-item {
+  border-radius: 8px;
+  margin: 4px 8px !important;
+  width: calc(100% - 16px) !important;
+}
+
+/* Stat card gradient accent bars */
+.stat-card-accent {
+  position: relative;
+  overflow: hidden;
+}
+.stat-card-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #1677ff 0%, #0958d9 100%);
+  border-radius: 4px 0 0 4px;
+}
+.stat-card-accent-red::before {
+  background: linear-gradient(180deg, #ff4d4f 0%, #cf1322 100%);
+}
+.stat-card-accent-orange::before {
+  background: linear-gradient(180deg, #ffa940 0%, #fa541c 100%);
+}
+.stat-card-accent-purple::before {
+  background: linear-gradient(180deg, #b37feb 0%, #722ed1 100%);
+}
+.stat-card-accent-green::before {
+  background: linear-gradient(180deg, #73d13d 0%, #389e0d 100%);
+}
+
+@media (max-width: 900px) {
+  .clinical-header { padding-inline: 16px !important; }
+  .clinical-content { padding: 16px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,100 @@
+/* Desktop Full-Bleed Hospital Clinical Login Layout */
+.ward-login-container {
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  background: #ffffff;
+}
+
+.ward-login-hero {
+  flex: 1.15;
+  height: 100vh;
+  position: relative;
+  background: #022c4b url('/images/medical-hero.jpg') center center / cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ward-login-hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 5vh, 60px) clamp(32px, 4vw, 56px);
+  background: linear-gradient(145deg, rgba(2, 44, 75, 0.94) 0%, rgba(3, 105, 161, 0.88) 55%, rgba(15, 23, 42, 0.96) 100%);
+  backdrop-filter: blur(2px);
+  color: #ffffff;
+}
+
+.ward-login-panel {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(24px, 4vh, 48px) clamp(24px, 4vw, 56px);
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.ward-login-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.ward-care-heading {
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ward-care-heading h4.ant-typography {
+  margin: 0;
+  color: #0369a1;
+  font-weight: 700;
+}
+
+/* Responsive adjustment for small desktop / tablets */
+@media (max-width: 900px) {
+  .ward-login-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  .ward-login-hero {
+    flex: none;
+    min-height: 220px;
+    height: auto;
+  }
+  .ward-login-hero-overlay {
+    position: relative;
+    padding: 24px 20px;
+  }
+  .ward-login-panel {
+    flex: none;
+    height: auto;
+    padding: 24px 16px 36px;
+  }
+  .ward-login-card {
+    max-width: 100%;
+  }
+}

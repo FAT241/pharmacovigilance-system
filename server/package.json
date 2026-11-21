@@ -1,0 +1,28 @@
+{
+  "name": "@dacs4/server",
+  "private": true,
+  "scripts": {
+    "test:encounters": "tsx --env-file=../.env --test tests/encounters.test.ts",
+    "test:prescriptions": "tsx --env-file=../.env --test tests/prescriptions.test.ts",
+    "test:rules": "tsx --env-file=../.env --test tests/rule-status.test.ts",
+    "dev": "tsx watch --env-file=../.env src/index.ts",
+    "build": "tsc --noEmit",
+    "start": "tsx --env-file=../.env src/index.ts",
+    "db:seed": "tsx --env-file=../.env prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6",
+    "bcryptjs": "^3.0.3",
+    "express": "^5",
+    "express-rate-limit": "^8.7.4",
+    "jsonwebtoken": "^9.0.3",
+    "socket.io": "^4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22",
+    "tsx": "^4"
+  }
+}

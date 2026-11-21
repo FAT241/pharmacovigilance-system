@@ -1,0 +1,401 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum AccountStatus {
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id              String        @id @default(uuid()) @db.Uuid
+  username        String        @unique
+  passwordHash    String?       @map("password_hash")
+  fullName        String        @map("full_name")
+  role            Role
+  status          AccountStatus @default(ACTIVE)
+  department      String?
+  title           String?
+  disabledReason  String?       @map("disabled_reason")
+  sessionVersion  Int           @default(0) @map("session_version")
+  patient         Patient?
+  admissions      Encounter[]
+  checks          RuleCheck[]
+  ruleChanges     RuleChangeLog[]
+  approvals       Explanation[]
+  prescriptions   Prescription[]
+
+  @@map("users")
+}
+
+model Patient {
+  id          String  @id @default(uuid()) @db.Uuid
+  userId      String  @unique @map("user_id") @db.Uuid
+  user        User    @relation(fields: [userId], references: [id])
+  patientCode String  @unique @map("patient_code")
+  birthDate   DateTime @map("birth_date") @db.Date
+  gender      Gender
+  phone       String?
+  idCard      String? @unique @map("id_card")
+  address     String?
+  encounters  Encounter[]
+  homeMedications PatientMedication[]
+  historyNote String @default("") @map("history_note")
+  conditions Disease[]
+
+  @@map("patients")
+}
+
+model Encounter {
+  id           String    @id @default(uuid()) @db.Uuid
+  patientId    String    @map("patient_id") @db.Uuid
+  doctorId     String    @map("doctor_id") @db.Uuid
+  admittedAt   DateTime  @default(now()) @map("admitted_at") @db.Timestamptz(3)
+  dischargedAt DateTime? @map("discharged_at") @db.Timestamptz(3)
+  prescriptions Prescription[]
+  admissionNote String?  @map("admission_note")
+  dischargeCondition String? @map("discharge_condition")
+  followUpAdvice String? @map("follow_up_advice")
+  progressNotes ProgressNote[]
+  allergyStatus AllergyStatus @default(UNKNOWN) @map("allergy_status")
+  allergens     Allergen[]
+  diagnoses     Disease[]
+  weights       WeightObservation[]
+  observations Observation[]
+  publishedDiagnoses String[] @default([]) @map("published_diagnoses")
+  publishedAdvice String? @map("published_advice")
+  publishedAt DateTime? @db.Timestamptz(3) @map("published_at")
+  reconciliation MedicationReview[]
+  orders        PrescriptionItem[]
+  checks        RuleCheck[]
+  version      Int       @default(0)
+  patient      Patient   @relation(fields: [patientId], references: [id], onDelete: NoAction)
+  doctor       User      @relation(fields: [doctorId], references: [id], onDelete: NoAction)
+
+  @@index([patientId, admittedAt])
+  @@map("encounters")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BaseUnit {
+  TABLET
+  ML
+}
+
+model Medication {
+  id                String                 @id @default(uuid()) @db.Uuid
+  code              String                 @unique
+  name              String
+  strength          String
+  dosageForm        String                 @map("dosage_form")
+  baseUnit          BaseUnit               @map("base_unit")
+  active            Boolean                @default(true)
+  activeIngredients MedicationIngredient[]
+  homeMedications   PatientMedication[]
+  orders            PrescriptionItem[]
+  allergens         Allergen[]
+  groups            DrugGroup[]
+  referenceSource   String? @map("reference_source")
+  referenceText     String? @map("reference_text")
+
+  @@map("medications")
+}
+
+enum AllergyStatus {
+  UNKNOWN
+  NONE_REPORTED
+  REPORTED
+}
+
+model Disease {
+  code String @id
+  name String
+  encounters Encounter[]
+  ruleScopes RuleDisease[]
+  patients Patient[]
+  @@map("diseases")
+}
+
+model DrugGroup {
+  code String @id
+  name String
+  medications Medication[]
+  @@map("drug_groups")
+}
+
+model ProgressNote {
+  id String @id @default(uuid()) @db.Uuid
+  encounterId String @map("encounter_id") @db.Uuid
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  body String
+  recordedAt DateTime @default(now()) @map("recorded_at") @db.Timestamptz(3)
+  @@index([encounterId, recordedAt])
+  @@map("progress_notes")
+}
+
+model Observation {
+  id String @id @default(uuid()) @db.Uuid
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  kind String
+  value Decimal @db.Decimal(12, 3)
+  unit String
+  measuredAt DateTime @db.Timestamptz(3) @map("measured_at")
+  @@index([encounterId, measuredAt])
+  @@map("observations")
+}
+
+model Allergen {
+  code String @id
+  name String
+  encounters Encounter[]
+  medications Medication[]
+  @@map("allergens")
+}
+
+model WeightObservation {
+  id String @id @default(uuid()) @db.Uuid
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  kilograms Decimal @db.Decimal(6, 2)
+  measuredAt DateTime @default(now()) @db.Timestamptz(3) @map("measured_at")
+  @@index([encounterId, measuredAt])
+  @@map("weight_observations")
+}
+
+model PatientMedication {
+  id String @id @default(uuid()) @db.Uuid
+  patientId String @db.Uuid @map("patient_id")
+  patient Patient @relation(fields: [patientId], references: [id])
+  medicationId String @db.Uuid @map("medication_id")
+  medication Medication @relation(fields: [medicationId], references: [id])
+  recordedAt DateTime @default(now()) @db.Timestamptz(3) @map("recorded_at")
+  endedAt DateTime? @db.Timestamptz(3) @map("ended_at")
+  reviews MedicationReview[]
+  @@map("patient_medications")
+}
+
+enum ReviewDecision {
+  PENDING
+  CONTINUE
+  STOP
+}
+
+model MedicationReview {
+  id String @id @default(uuid()) @db.Uuid
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  patientMedicationId String @db.Uuid @map("patient_medication_id")
+  homeMedication PatientMedication @relation(fields: [patientMedicationId], references: [id])
+  decision ReviewDecision @default(PENDING)
+  stopReason String? @map("stop_reason")
+  decidedAt DateTime? @db.Timestamptz(3) @map("decided_at")
+  draftItem PrescriptionItem?
+  @@unique([encounterId, patientMedicationId])
+  @@map("medication_reviews")
+}
+
+// A reconciliation draft becomes actionable only after the prescribing workflow confirms it.
+model PrescriptionItem {
+  id String @id @default(uuid()) @db.Uuid
+  reviewId String? @unique @db.Uuid @map("review_id")
+  review MedicationReview? @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  medicationId String @db.Uuid @map("medication_id")
+  medication Medication @relation(fields: [medicationId], references: [id])
+  startedAt DateTime? @db.Timestamptz(3) @map("started_at")
+  endedAt DateTime? @db.Timestamptz(3) @map("ended_at")
+  endReason String? @map("end_reason")
+  replacesItemId String? @db.Uuid @map("replaces_item_id")
+  replaces PrescriptionItem? @relation("replacement", fields: [replacesItemId], references: [id])
+  replacements PrescriptionItem[] @relation("replacement")
+  checks RuleCheck[]
+  dose Decimal @db.Decimal(12, 4)
+  doseUnit BaseUnit @map("dose_unit")
+  route String? 
+  durationDays Int? @map("duration_days")
+  explanation Explanation?
+  schedule Json
+  status PrescriptionItemStatus @default(DRAFT)
+  @@index([encounterId, status])
+  @@map("prescription_items")
+}
+
+model Explanation {
+  itemId String @id @db.Uuid @map("item_id")
+  item PrescriptionItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  status ExplanationStatus
+  revision Int @default(1)
+  draft String?
+  approvedText String? @map("approved_text")
+  approvedBy String? @db.Uuid @map("approved_by")
+  approver User? @relation(fields: [approvedBy], references: [id])
+  approvedAt DateTime? @db.Timestamptz(3) @map("approved_at")
+  updatedAt DateTime @updatedAt @db.Timestamptz(3) @map("updated_at")
+  source String
+  excerpt String
+  failure String?
+  @@map("explanations")
+}
+
+enum ExplanationStatus {
+  GENERATING
+  DRAFT
+  APPROVED
+  FAILED
+}
+
+enum PrescriptionItemStatus {
+  DRAFT
+  ACTIVE
+  ENDED
+  REPLACED
+}
+
+enum CheckStatus {
+  NO_ALERT
+  HAS_ALERT
+  INSUFFICIENT_DATA
+  ERROR
+}
+
+enum RuleOutcome {
+  MATCHED
+  NOT_MATCHED
+  INSUFFICIENT_DATA
+  ERROR
+}
+
+model AlertRule {
+  code String @id
+  version Int @default(1)
+  active Boolean @default(true)
+  condition Json
+  referenceSource String? @map("reference_source")
+  scopes RuleDisease[]
+  title String
+  results RuleCheckResult[]
+  changes RuleChangeLog[]
+  @@map("alert_rules")
+}
+
+model RuleDisease {
+  ruleCode String @map("rule_code")
+  diseaseCode String @map("disease_code")
+  rule AlertRule @relation(fields: [ruleCode], references: [code], onDelete: Cascade)
+  disease Disease @relation(fields: [diseaseCode], references: [code], onDelete: Restrict)
+  @@id([ruleCode, diseaseCode])
+  @@map("rule_diseases")
+}
+
+model RuleChangeLog {
+  id Int @id @default(autoincrement())
+  ruleCode String @map("rule_code")
+  rule AlertRule @relation(fields: [ruleCode], references: [code])
+  ruleTitle String @map("rule_title")
+  version Int
+  oldActive Boolean @map("old_active")
+  active Boolean
+  reason String
+  changedBy String @db.Uuid @map("changed_by")
+  actor User @relation(fields: [changedBy], references: [id])
+  changedAt DateTime @default(now()) @db.Timestamptz(3) @map("changed_at")
+
+  @@unique([ruleCode, version])
+  @@map("rule_change_logs")
+}
+
+enum CheckTrigger {
+  PRESCRIBING
+  ADMISSION
+  CLINICAL_CHANGE
+  BEFORE_DISCHARGE
+}
+
+model Prescription {
+  id String @id @default(uuid()) @db.Uuid
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  doctorId String @db.Uuid @map("doctor_id")
+  doctor User @relation(fields: [doctorId], references: [id])
+  checkId String @unique @db.Uuid @map("check_id")
+  check RuleCheck @relation(fields: [checkId], references: [id], onDelete: Cascade)
+  confirmedAt DateTime @db.Timestamptz(3) @map("confirmed_at")
+  idempotencyKey String? @db.Uuid @map("idempotency_key")
+  requestHash String? @db.Char(64) @map("request_hash")
+  @@unique([doctorId, idempotencyKey])
+  @@map("prescriptions")
+}
+
+model RuleCheck {
+  prescription Prescription?
+  id String @id @default(uuid()) @db.Uuid
+  itemId String? @db.Uuid @map("item_id")
+  item PrescriptionItem? @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  encounterId String @db.Uuid @map("encounter_id")
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  trigger CheckTrigger @default(PRESCRIBING)
+  encounterVersion Int @map("encounter_version")
+  requestedBy String @db.Uuid @map("requested_by")
+  doctor User @relation(fields: [requestedBy], references: [id])
+  checkedAt DateTime @default(now()) @db.Timestamptz(3) @map("checked_at")
+  status CheckStatus
+  contextSnapshot Json @map("context_snapshot")
+  confirmedAt DateTime? @db.Timestamptz(3) @map("confirmed_at")
+  overrideReason String? @map("override_reason")
+  results RuleCheckResult[]
+  @@index([itemId, checkedAt])
+  @@index([encounterId, checkedAt, id])
+  @@map("rule_checks")
+}
+
+model RuleCheckResult {
+  ruleCheckId String @db.Uuid @map("rule_check_id")
+  check RuleCheck @relation(fields: [ruleCheckId], references: [id], onDelete: Cascade)
+  ruleCode String @map("rule_code")
+  rule AlertRule @relation(fields: [ruleCode], references: [code])
+  ruleVersion Int @map("rule_version")
+  outcome RuleOutcome
+  message String
+  evidence Json
+  missingFields String[] @map("missing_fields")
+  @@id([ruleCheckId, ruleCode])
+  @@map("rule_check_results")
+}
+
+model Ingredient {
+  id          String                 @id @default(uuid()) @db.Uuid
+  name        String
+  nameKey     String                 @unique @map("name_key")
+  medications MedicationIngredient[]
+
+  @@map("ingredients")
+}
+
+model MedicationIngredient {
+  medicationId String     @map("medication_id") @db.Uuid
+  ingredientId String     @map("ingredient_id") @db.Uuid
+  amount       Decimal    @db.Decimal(16, 6)
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@id([medicationId, ingredientId])
+  @@map("medication_ingredients")
+}

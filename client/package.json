@@ -1,0 +1,23 @@
+{
+  "name": "@dacs4/client",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --strictPort",
+    "desktop": "electron desktop/main.cjs",
+    "build": "tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "antd": "^5",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-router-dom": "^7.18.5",
+    "socket.io-client": "^4.8.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "electron": "^41",
+    "vite": "^7"
+  }
+}
