@@ -34,6 +34,7 @@ export const clinicalChange = z.discriminatedUnion('action', [
   z.object({ action: z.literal('PROGRESS_NOTE'), version, body: z.string().trim().min(1).max(3000) }),
   z.object({ action: z.literal('PUBLISH'), version, advice: z.string().trim().max(3000) }),
   z.object({ action: z.literal('ADD_MEDICATION'), version, medicationId: z.string().uuid() }),
+  z.object({ action: z.literal('ADD_MEDICATIONS_BATCH'), version, medicationIds: z.array(z.string().uuid()).min(1) }),
   z.object({ action: z.literal('REMOVE_MEDICATION'), version, reviewId: z.string().uuid() }),
   z.object({ action: z.literal('STOP'), version, reviewId: z.string().uuid(), reason: z.string().trim().min(1).max(500).optional() }),
   z.object({

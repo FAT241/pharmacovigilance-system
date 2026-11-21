@@ -46,6 +46,7 @@ export type Change = ({ action: 'PROFILE' } & ClinicalProfile)
   | { action: 'PROGRESS_NOTE'; body: string }
   | { action: 'PUBLISH'; advice: string }
   | { action: 'ADD_MEDICATION'; medicationId: string }
+  | { action: 'ADD_MEDICATIONS_BATCH'; medicationIds: string[] }
   | { action: 'REMOVE_MEDICATION'; reviewId: string }
   | { action: 'STOP'; reviewId: string; reason?: string }
   | { action: 'CONTINUE'; reviewId: string; slots?: string[]; dose: number; timesPerDay: number; route?: string; durationDays?: number | null }

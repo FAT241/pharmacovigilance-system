@@ -95,6 +95,22 @@ export async function updateClinical(where: { patientId: string; id: string }, d
       await tx.patientMedication.create({ data: {
         patientId: where.patientId, medicationId: medication.id, reviews: { create: { encounterId: where.id } },
       } })
+    } else if (change.action === 'ADD_MEDICATIONS_BATCH') {
+      for (const medId of change.medicationIds) {
+        const medication = await tx.medication.findFirst({ where: { id: medId, active: true } })
+        if (!medication) continue
+        const duplicate = await tx.medicationReview.findFirst({
+          where: { encounterId: where.id, homeMedication: { medicationId: medId } },
+        })
+        if (duplicate) continue
+        await tx.patientMedication.create({
+          data: {
+            patientId: where.patientId,
+            medicationId: medication.id,
+            reviews: { create: { encounterId: where.id } },
+          },
+        })
+      }
     } else if (change.action === 'REMOVE_MEDICATION') {
       const review = await tx.medicationReview.findUniqueOrThrow({
         where: { id: change.reviewId, encounterId: where.id },
