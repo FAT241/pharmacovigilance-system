@@ -14,6 +14,8 @@ import {
   Tag,
   Typography,
   Badge,
+  Popconfirm,
+  message,
 } from 'antd'
 import {
   ArrowLeftOutlined,
@@ -173,11 +175,12 @@ export function ClinicalWorkspace({
             Quay lại danh sách
           </Button>
           {!editable && data && !data.record.dischargedAt && doctorId && (
-            <Button
-              type="primary"
-              style={{ background: '#059669', borderColor: '#059669' }}
-              loading={busy}
-              onClick={async () => {
+            <Popconfirm
+              title="Tiếp nhận phụ trách bệnh nhân"
+              description={`Bệnh nhân hiện do ${data.record.doctor?.fullName || 'bác sĩ khác'} phụ trách. Bạn có chắc muốn tiếp nhận bệnh nhân này về cho mình?`}
+              okText="Xác nhận tiếp nhận"
+              cancelText="Hủy"
+              onConfirm={async () => {
                 setBusy(true)
                 try {
                   const encounterPath = path.replace(/\/clinical$/, '')
@@ -191,8 +194,14 @@ export function ClinicalWorkspace({
                 }
               }}
             >
-              Tiếp nhận phụ trách bệnh nhân này
-            </Button>
+              <Button
+                type="primary"
+                style={{ background: '#059669', borderColor: '#059669' }}
+                loading={busy}
+              >
+                Tiếp nhận phụ trách bệnh nhân này
+              </Button>
+            </Popconfirm>
           )}
           {editable && (
             <>

@@ -75,6 +75,10 @@ export async function updateClinical(where: { patientId: string; id: string }, d
           },
         })
       }
+    } else if (change.action === 'DELETE_OBSERVATION') {
+      await tx.observation.deleteMany({
+        where: { id: change.observationId, encounterId: where.id },
+      })
     } else if (change.action === 'PROGRESS_NOTE') {
       await tx.progressNote.create({ data: { encounterId: where.id, body: change.body } })
     } else if (change.action === 'PUBLISH') {
