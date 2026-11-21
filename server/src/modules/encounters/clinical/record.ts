@@ -61,6 +61,9 @@ export async function updateClinical(where: { patientId: string; id: string }, d
       const measuredAt = new Date(change.measuredAt)
       if (measuredAt < encounter.admittedAt || measuredAt.getTime() > Date.now()) throw new HttpError(400, 'Thời điểm đo phải nằm trong đợt điều trị và không ở tương lai.')
       await tx.observation.create({ data: { encounterId: where.id, kind: change.kind, unit: observationKinds[change.kind][1], value: change.value, measuredAt } })
+      if (change.kind === 'WEIGHT') {
+        await tx.weightObservation.create({ data: { encounterId: where.id, kilograms: change.value, measuredAt } })
+      }
     } else if (change.action === 'OBSERVATIONS_BATCH') {
       const measuredAt = new Date(change.measuredAt)
       if (measuredAt < encounter.admittedAt || measuredAt.getTime() > Date.now()) throw new HttpError(400, 'Thời điểm đo phải nằm trong đợt điều trị và không ở tương lai.')
@@ -74,6 +77,11 @@ export async function updateClinical(where: { patientId: string; id: string }, d
             measuredAt,
           },
         })
+        if (item.kind === 'WEIGHT') {
+          await tx.weightObservation.create({
+            data: { encounterId: where.id, kilograms: item.value, measuredAt },
+          })
+        }
       }
     } else if (change.action === 'DELETE_OBSERVATION') {
       await tx.observation.deleteMany({

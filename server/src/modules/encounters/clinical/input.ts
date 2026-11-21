@@ -10,6 +10,7 @@ export const observationKinds = {
   HEART_RATE: ['Nhịp tim', 'lần/phút'], TEMPERATURE: ['Nhiệt độ', '°C'],
   GLUCOSE: ['Glucose máu', 'mmol/L'], HBA1C: ['HbA1c', '%'],
   CREATININE: ['Creatinine', 'µmol/L'], EGFR: ['eGFR', 'mL/phút/1,73 m²'],
+  WEIGHT: ['Cân nặng', 'kg'],
 } as const
 export const clinicalParams = z.object({ patientId: z.string().uuid(), id: z.string().uuid() })
 export const clinicalChange = z.discriminatedUnion('action', [

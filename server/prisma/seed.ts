@@ -54,6 +54,11 @@ async function seed() {
   const diseases = [
     { code: 'I10', name: 'Tăng huyết áp nguyên phát (vô căn)' },
     { code: 'E11', name: 'Đái tháo đường típ 2' },
+    { code: 'I50', name: 'Suy tim (Heart Failure)' },
+    { code: 'E66', name: 'Béo phì (Obesity)' },
+    { code: 'R60', name: 'Phù, chưa được phân loại nơi khác (Edema / Phù chi dưới)' },
+    { code: 'N18', name: 'Bệnh thận mạn tính (Chronic Kidney Disease)' },
+    { code: 'R05', name: 'Ho (Cough / Ho khan)' },
   ]
   for (const d of diseases) {
     await database.disease.upsert({
@@ -305,6 +310,32 @@ async function seed() {
         type: 'DISEASE_GROUP',
         group: 'DEMO_GROUP',
         disease: 'I10',
+        schemaVersion: 1,
+      },
+      scopes: [],
+    },
+    {
+      code: 'CCB_OBESITY_EDEMA',
+      title: 'Thận trọng: Thuốc chẹn Calci (Amlodipine) ở bệnh nhân Béo phì (E66) - Nguy cơ phù chi dưới',
+      active: true,
+      referenceSource: 'Dược thư Quốc gia Việt Nam (2022) · ACC/AHA Hypertension Guidelines',
+      condition: {
+        type: 'DISEASE_GROUP',
+        group: 'CCB',
+        disease: 'E66',
+        schemaVersion: 1,
+      },
+      scopes: [],
+    },
+    {
+      code: 'CCB_HEART_FAILURE',
+      title: 'Chống chỉ định / Thận trọng: Thuốc chẹn Calci (Amlodipine) ở bệnh nhân Suy tim (I50)',
+      active: true,
+      referenceSource: 'Hướng dẫn chẩn đoán và điều trị suy tim - Bộ Y tế & ESC Heart Failure Guidelines',
+      condition: {
+        type: 'DISEASE_GROUP',
+        group: 'CCB',
+        disease: 'I50',
         schemaVersion: 1,
       },
       scopes: [],

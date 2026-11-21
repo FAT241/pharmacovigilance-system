@@ -13,6 +13,7 @@ import {
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
+  ExclamationCircleFilled,
   FileDoneOutlined,
   PlusOutlined,
   SafetyCertificateOutlined,
@@ -55,8 +56,87 @@ export function ClinicalOverview({
     ERROR: 'default',
   }
 
+  // Giám sát Dược cảnh giác chủ động (Active Pharmacovigilance)
+  const activeOrders = record.orders.filter((o) => o.status === 'ACTIVE')
+  const isTakingAmlo = activeOrders.some((o) => {
+    const n = o.medication.name.toLowerCase()
+    return n.includes('amlo') || n.includes('amlor')
+  })
+  const isTakingAcei = activeOrders.some((o) => {
+    const n = o.medication.name.toLowerCase()
+    return n.includes('enalapril') || n.includes('renitec')
+  })
+
+  const allNotesText = record.progressNotes.map((p) => p.body.toLowerCase()).join(' ')
+  const hasEdemaInNotes = allNotesText.includes('phù') || allNotesText.includes('sưng chân') || allNotesText.includes('edema')
+  const hasCoughInNotes = allNotesText.includes('ho khan') || allNotesText.includes('ho kéo dài')
+
+  const hasAmloEdemaSuspected = isTakingAmlo && hasEdemaInNotes
+  const hasAceiCoughSuspected = isTakingAcei && hasCoughInNotes
+
+  const initialWeight = record.weights.length > 0 ? Number(record.weights[record.weights.length - 1].kilograms) : null
+  const currentWeight = record.weights.length > 0 ? Number(record.weights[0].kilograms) : null
+  const weightGain = initialWeight && currentWeight ? Number((currentWeight - initialWeight).toFixed(1)) : 0
+  const hasWeightGainAmlo = isTakingAmlo && weightGain >= 2
+
   return (
     <div style={{ display: 'grid', gap: 18 }}>
+      {/* Cảnh báo Dược cảnh giác ADR phát hiện từ Diễn biến lâm sàng / Cân nặng */}
+      {hasAmloEdemaSuspected && (
+        <Alert
+          type="error"
+          showIcon
+          icon={<ExclamationCircleFilled style={{ fontSize: 20, color: '#dc2626' }} />}
+          message={<strong style={{ fontSize: 14 }}>Phát hiện nghi ngờ ADR Dược cảnh giác: Phù ngoại vi do Amlodipine</strong>}
+          description={
+            <div>
+              <div>
+                Diễn tiến điều trị ghi nhận triệu chứng <strong>phù / sưng chi dưới</strong> trong khi bệnh nhân đang dùng <strong>Amlodipine (Amlor)</strong>.
+              </div>
+              <div style={{ marginTop: 4, color: '#b91c1c' }}>
+                💡 <strong>Khuyến cáo Dược lâm sàng:</strong> Phù do Amlodipine là tác dụng phụ phụ thuộc liều. Khuyến cáo <strong>xem xét giảm liều Amlodipine</strong> (từ 10mg xuống 5mg hoặc 2.5mg), hoặc đổi sang nhóm Ức chế men chuyển (ACEi) / Chẹn thụ thể (ARB) nếu cần.
+              </div>
+            </div>
+          }
+          style={{ borderRadius: 10, border: '1px solid #fca5a5', background: '#fef2f2' }}
+        />
+      )}
+
+      {hasAceiCoughSuspected && (
+        <Alert
+          type="warning"
+          showIcon
+          icon={<ExclamationCircleFilled style={{ fontSize: 20, color: '#d97706' }} />}
+          message={<strong style={{ fontSize: 14 }}>Phát hiện nghi ngờ ADR Dược cảnh giác: Ho khan do Enalapril (ACEi)</strong>}
+          description={
+            <div>
+              <div>
+                Diễn tiến điều trị ghi nhận triệu chứng <strong>ho khan kéo dài</strong> trong khi bệnh nhân đang dùng <strong>Enalapril (Renitec)</strong>.
+              </div>
+              <div style={{ marginTop: 4, color: '#b45309' }}>
+                💡 <strong>Khuyến cáo Dược lâm sàng:</strong> Ho khan là tác dụng phụ do ứ đọng Bradykinin của nhóm ức chế men chuyển. Khuyến cáo <strong>xem xét chuyển sang nhóm Chẹn thụ thể ARB (như Losartan / Cozaar)</strong> không gây ho khan.
+              </div>
+            </div>
+          }
+          style={{ borderRadius: 10, border: '1px solid #fde68a', background: '#fffbeb' }}
+        />
+      )}
+
+      {hasWeightGainAmlo && !hasAmloEdemaSuspected && (
+        <Alert
+          type="warning"
+          showIcon
+          icon={<ExclamationCircleFilled style={{ fontSize: 20, color: '#d97706' }} />}
+          message={<strong style={{ fontSize: 14 }}>Cảnh báo Biến động Cân nặng: Nghi ngờ tích nước / phù do Amlodipine</strong>}
+          description={
+            <div>
+              Cân nặng bệnh nhân tăng đột ngột <strong>+{weightGain} kg</strong> so với lúc nhập viện trong khi đang dùng <strong>Amlodipine</strong>. Khuyến cáo kiểm tra ấn lõm mắt cá chân và xem xét giảm liều thuốc.
+            </div>
+          }
+          style={{ borderRadius: 10, border: '1px solid #fde68a', background: '#fffbeb' }}
+        />
+      )}
+
       {/* 1. Vital Signs KPI Quick Cards Row */}
       <Row gutter={[16, 16]}>
         {/* Huyết áp */}

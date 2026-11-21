@@ -93,6 +93,31 @@ export function Measurements({ data, editable, onSave }: { data: ClinicalData; e
   const glucose = Form.useWatch('glucose', form)
   const creatinine = Form.useWatch('creatinine', form)
   const egfr = Form.useWatch('egfr', form)
+  const weight = Form.useWatch('weight', form)
+
+  const baselineWeight = data.record.weights.length > 0 ? Number(data.record.weights[data.record.weights.length - 1].kilograms) : undefined
+  const latestWeightNum = data.record.weights.length > 0 ? Number(data.record.weights[0].kilograms) : undefined
+
+  let weightDeltaTag: { type: 'error' | 'warning' | 'info'; text: string } | null = null
+  if (weight && baselineWeight) {
+    const diff = Number((Number(weight) - baselineWeight).toFixed(1))
+    if (diff >= 2) {
+      weightDeltaTag = {
+        type: 'error',
+        text: `Tăng +${diff} kg so với ban đầu (${baselineWeight} kg) ⚠️ Nghi ngờ tích dịch / phù do thuốc!`,
+      }
+    } else if (diff > 0) {
+      weightDeltaTag = {
+        type: 'warning',
+        text: `Tăng +${diff} kg so với ban đầu (${baselineWeight} kg)`,
+      }
+    } else if (diff < 0) {
+      weightDeltaTag = {
+        type: 'info',
+        text: `Giảm ${Math.abs(diff)} kg so với ban đầu (${baselineWeight} kg)`,
+      }
+    }
+  }
 
   const sysAlert = getBpSysAlert(bpSys)
   const diaAlert = getBpDiaAlert(bpDia)
@@ -113,6 +138,7 @@ export function Measurements({ data, editable, onSave }: { data: ClinicalData; e
       hba1c: 'HBA1C',
       creatinine: 'CREATININE',
       egfr: 'EGFR',
+      weight: 'WEIGHT',
     }
 
     for (const [field, kind] of Object.entries(mapping)) {
@@ -368,6 +394,39 @@ export function Measurements({ data, editable, onSave }: { data: ClinicalData; e
                   rules={[{ type: 'number', min: 5, max: 200, message: 'eGFR hợp lệ từ 5 - 200 mL/phút' }]}
                 >
                   <InputNumber min={5} max={200} step={1} style={{ width: '100%' }} placeholder="VD: 85" addonAfter="mL/phút" />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            {/* Nhóm Cân nặng & Theo dõi phù / biến động cân nặng */}
+            <Typography.Text strong style={{ color: '#0f172a', display: 'block', marginTop: 10, marginBottom: 10 }}>
+              4. Cân nặng & Giám sát phù ngoại vi (Biến động thể trạng):
+            </Typography.Text>
+            <Row gutter={[16, 0]}>
+              <Col xs={24} sm={12} md={12}>
+                <Form.Item
+                  name="weight"
+                  label={
+                    <Space size={4}>
+                      <span>Cân nặng hôm nay</span>
+                      {weightDeltaTag && (
+                        <Tag
+                          icon={<ExclamationCircleFilled />}
+                          color={weightDeltaTag.type === 'error' ? 'red' : weightDeltaTag.type === 'warning' ? 'gold' : 'blue'}
+                        >
+                          {weightDeltaTag.text}
+                        </Tag>
+                      )}
+                    </Space>
+                  }
+                  rules={[{ type: 'number', min: 1, max: 500, message: 'Cân nặng hợp lệ từ 1 đến 500 kg' }]}
+                  extra={
+                    baselineWeight
+                      ? `Cân nặng ban đầu lúc nhập viện: ${baselineWeight} kg · Lần cân gần nhất: ${latestWeightNum} kg`
+                      : 'Chưa có dữ liệu cân nặng ban đầu để so sánh biến động.'
+                  }
+                >
+                  <InputNumber min={1} max={500} step={0.5} precision={1} style={{ width: '100%' }} placeholder="VD: 63.5" addonAfter="kg" />
                 </Form.Item>
               </Col>
             </Row>

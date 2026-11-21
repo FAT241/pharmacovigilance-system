@@ -52,11 +52,22 @@ function evaluate(rule: CheckContext['rules'][number], ctx: CheckContext) {
       if (present(config.left) && present(config.right)) return result('MATCHED', 'Có cặp hoạt chất thuộc luật thí điểm.', { ingredients: [config.left, config.right] })
       return ctx.orders.some(i => !i.ingredients.length) ? missing('Chưa đủ thành phần để đối chiếu cặp hoạt chất.', 'medication.ingredients') : clear()
     }
-    case 'DISEASE_GROUP':
+    case 'DISEASE_GROUP': {
       if (!ctx.orders.some(i => i.groups.includes(config.group))) return clear()
       if (!ctx.diagnoses.length) return missing('Chưa ghi chẩn đoán cho đợt điều trị.', 'diagnoses')
-      return ctx.diagnoses.includes(config.disease)
-        ? result('MATCHED', 'Chẩn đoán và nhóm thuốc khớp luật thí điểm.', { disease: config.disease, group: config.group }) : clear()
+      if (ctx.diagnoses.includes(config.disease)) {
+        let msg = 'Chẩn đoán và nhóm thuốc khớp luật cảnh báo an toàn.'
+        if (config.disease === 'E66' && config.group === 'CCB') {
+          msg = 'Bệnh nhân có bệnh nền Béo phì (E66). Thuốc chẹn Calci (Amlodipine) có nguy cơ cao bùng phát phù chi dưới nặng. Khuyến cáo xem xét giảm liều Amlodipine (2.5mg - 5mg) và theo dõi sát cân nặng/phù.'
+        } else if (config.disease === 'I50' && config.group === 'CCB') {
+          msg = 'Bệnh nhân có tiền sử Suy tim (I50). Thuốc chẹn Calci (Amlodipine) làm tăng nguy cơ tích dịch và phù chi dưới nặng. Khuyến cáo giảm liều hoặc ngưng dùng.'
+        } else if (config.disease === 'R60' && config.group === 'CCB') {
+          msg = 'Bệnh nhân có tiền sử Phù chi dưới (R60). Amlodipine dễ gây thoát dịch phù mắt cá chân. Khuyến cáo xem xét giảm liều Amlodipine.'
+        }
+        return result('MATCHED', msg, { disease: config.disease, group: config.group })
+      }
+      return clear()
+    }
     case 'WEIGHT_LIMIT': {
       const targets = ctx.orders.filter(i => has(i, config.ingredient))
       if (ctx.orders.some(i => !i.ingredients.length)) return missing('Thiếu thành phần để tính tổng liều hoạt chất.', 'medication.ingredients')
