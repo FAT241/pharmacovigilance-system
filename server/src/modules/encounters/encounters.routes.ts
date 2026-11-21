@@ -74,6 +74,17 @@ encountersRouter.post('/', async (request, response) => {
   }
 })
 
+encountersRouter.patch('/:id/assign-doctor', async (request, response) => {
+  const { patientId, id } = encounterParams.parse(request.params)
+  const doctorId = response.locals.account.id
+  const updated = await database.encounter.update({
+    where: { id, patientId, dischargedAt: null },
+    data: { doctorId },
+    include,
+  })
+  response.json(updated)
+})
+
 encountersRouter.post('/:id/discharge', async (request, response) => {
   const { patientId, id } = encounterParams.parse(request.params)
   const doctorId = response.locals.account.id

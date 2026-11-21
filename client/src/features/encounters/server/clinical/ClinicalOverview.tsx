@@ -35,11 +35,11 @@ export function ClinicalOverview({
   const latestCheck = record.checks[0]
 
   // Extract key vitals
-  const sysBp = record.observations.find((o) => o.kind.toLowerCase().includes('tâm thu'))
-  const diaBp = record.observations.find((o) => o.kind.toLowerCase().includes('tâm trương'))
-  const heartRate = record.observations.find((o) => o.kind.toLowerCase().includes('nhịp tim') || o.kind.toLowerCase().includes('mạch'))
-  const glucose = record.observations.find((o) => o.kind.toLowerCase().includes('đường huyết') || o.kind.toLowerCase().includes('glucose'))
-  const creatinine = record.observations.find((o) => o.kind.toLowerCase().includes('creatinine'))
+  const sysBp = record.observations.find((o) => o.kind === 'BP_SYS' || o.kind.toLowerCase().includes('tâm thu'))
+  const diaBp = record.observations.find((o) => o.kind === 'BP_DIA' || o.kind.toLowerCase().includes('tâm trương'))
+  const heartRate = record.observations.find((o) => o.kind === 'HEART_RATE' || o.kind.toLowerCase().includes('nhịp tim') || o.kind.toLowerCase().includes('mạch'))
+  const glucose = record.observations.find((o) => o.kind === 'GLUCOSE' || o.kind.toLowerCase().includes('đường huyết') || o.kind.toLowerCase().includes('glucose'))
+  const creatinine = record.observations.find((o) => o.kind === 'CREATININE' || o.kind.toLowerCase().includes('creatinine'))
   const latestWeight = record.weights[0]
 
   const statusColorMap: Record<string, string> = {
@@ -57,8 +57,9 @@ export function ClinicalOverview({
         <Col xs={24} sm={12} md={6}>
           <Card
             bordered={false}
-            className="card-hover-lift"
-            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fee2e2' }}
+            hoverable
+            onClick={() => onNavigate('measurements')}
+            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fee2e2', cursor: 'pointer' }}
             bodyStyle={{ padding: 14 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -69,8 +70,8 @@ export function ClinicalOverview({
               {sysBp && diaBp ? `${sysBp.value}/${diaBp.value}` : sysBp ? `${sysBp.value}` : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>mmHg</span>
             </div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-              {sysBp ? new Date(sysBp.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa đo'}
+            <div style={{ fontSize: 11, color: sysBp ? '#059669' : '#0284c7', marginTop: 4 }}>
+              {sysBp ? `Đo lúc ${new Date(sysBp.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : '+ Nhấp để nhập đo'}
             </div>
           </Card>
         </Col>
@@ -79,8 +80,9 @@ export function ClinicalOverview({
         <Col xs={24} sm={12} md={6}>
           <Card
             bordered={false}
-            className="card-hover-lift"
-            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fecdd3' }}
+            hoverable
+            onClick={() => onNavigate('measurements')}
+            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fecdd3', cursor: 'pointer' }}
             bodyStyle={{ padding: 14 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -91,8 +93,8 @@ export function ClinicalOverview({
               {heartRate ? heartRate.value : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>lần/phút</span>
             </div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-              {heartRate ? new Date(heartRate.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa đo'}
+            <div style={{ fontSize: 11, color: heartRate ? '#059669' : '#0284c7', marginTop: 4 }}>
+              {heartRate ? `Đo lúc ${new Date(heartRate.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : '+ Nhấp để nhập đo'}
             </div>
           </Card>
         </Col>
@@ -101,8 +103,9 @@ export function ClinicalOverview({
         <Col xs={24} sm={12} md={6}>
           <Card
             bordered={false}
-            className="card-hover-lift"
-            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fef3c7' }}
+            hoverable
+            onClick={() => onNavigate('measurements')}
+            style={{ borderRadius: 10, background: '#fff', border: '1px solid #fef3c7', cursor: 'pointer' }}
             bodyStyle={{ padding: 14 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -113,8 +116,8 @@ export function ClinicalOverview({
               {glucose ? glucose.value : '—'}
               <span style={{ fontSize: 12, fontWeight: 400, color: '#64748b', marginLeft: 4 }}>{glucose?.unit || 'mmol/L'}</span>
             </div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-              {glucose ? new Date(glucose.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa đo'}
+            <div style={{ fontSize: 11, color: glucose ? '#059669' : '#0284c7', marginTop: 4 }}>
+              {glucose ? `Đo lúc ${new Date(glucose.measuredAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}` : '+ Nhấp để nhập đo'}
             </div>
           </Card>
         </Col>
@@ -123,8 +126,9 @@ export function ClinicalOverview({
         <Col xs={24} sm={12} md={6}>
           <Card
             bordered={false}
-            className="card-hover-lift"
-            style={{ borderRadius: 10, background: '#fff', border: '1px solid #e0f2fe' }}
+            hoverable
+            onClick={() => onNavigate('profile')}
+            style={{ borderRadius: 10, background: '#fff', border: '1px solid #e0f2fe', cursor: 'pointer' }}
             bodyStyle={{ padding: 14 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -140,8 +144,8 @@ export function ClinicalOverview({
                 </span>
               )}
             </div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-              {latestWeight ? `Cân lúc nhập viện (${latestWeight.kilograms} kg)` : 'Chưa nhập cân nặng'}
+            <div style={{ fontSize: 11, color: latestWeight ? '#059669' : '#0284c7', marginTop: 4 }}>
+              {latestWeight ? `Cân lúc nhập viện (${latestWeight.kilograms} kg)` : '+ Nhấp để nhập cân nặng'}
             </div>
           </Card>
         </Col>

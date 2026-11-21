@@ -41,6 +41,7 @@ export type ClinicalData = {
 }
 export type Change = ({ action: 'PROFILE' } & ClinicalProfile)
   | { action: 'OBSERVATION'; kind: string; value: number; measuredAt: string }
+  | { action: 'OBSERVATIONS_BATCH'; items: { kind: string; value: number }[]; measuredAt: string }
   | { action: 'PROGRESS_NOTE'; body: string }
   | { action: 'PUBLISH'; advice: string }
   | { action: 'ADD_MEDICATION'; medicationId: string }

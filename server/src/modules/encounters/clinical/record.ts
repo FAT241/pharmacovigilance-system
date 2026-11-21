@@ -61,6 +61,20 @@ export async function updateClinical(where: { patientId: string; id: string }, d
       const measuredAt = new Date(change.measuredAt)
       if (measuredAt < encounter.admittedAt || measuredAt.getTime() > Date.now()) throw new HttpError(400, 'Thời điểm đo phải nằm trong đợt điều trị và không ở tương lai.')
       await tx.observation.create({ data: { encounterId: where.id, kind: change.kind, unit: observationKinds[change.kind][1], value: change.value, measuredAt } })
+    } else if (change.action === 'OBSERVATIONS_BATCH') {
+      const measuredAt = new Date(change.measuredAt)
+      if (measuredAt < encounter.admittedAt || measuredAt.getTime() > Date.now()) throw new HttpError(400, 'Thời điểm đo phải nằm trong đợt điều trị và không ở tương lai.')
+      for (const item of change.items) {
+        await tx.observation.create({
+          data: {
+            encounterId: where.id,
+            kind: item.kind,
+            unit: observationKinds[item.kind][1],
+            value: item.value,
+            measuredAt,
+          },
+        })
+      }
     } else if (change.action === 'PROGRESS_NOTE') {
       await tx.progressNote.create({ data: { encounterId: where.id, body: change.body } })
     } else if (change.action === 'PUBLISH') {

@@ -21,6 +21,15 @@ export const clinicalChange = z.discriminatedUnion('action', [
   }),
   z.object({ action: z.literal('OBSERVATION'), version, kind: z.enum(Object.keys(observationKinds) as [keyof typeof observationKinds]),
     value: z.number().nonnegative().max(999999999).multipleOf(0.001), measuredAt: z.string().datetime() }),
+  z.object({
+    action: z.literal('OBSERVATIONS_BATCH'),
+    version,
+    measuredAt: z.string().datetime(),
+    items: z.array(z.object({
+      kind: z.enum(Object.keys(observationKinds) as [keyof typeof observationKinds]),
+      value: z.number().nonnegative().max(999999999).multipleOf(0.001),
+    })).min(1),
+  }),
   z.object({ action: z.literal('PROGRESS_NOTE'), version, body: z.string().trim().min(1).max(3000) }),
   z.object({ action: z.literal('PUBLISH'), version, advice: z.string().trim().max(3000) }),
   z.object({ action: z.literal('ADD_MEDICATION'), version, medicationId: z.string().uuid() }),

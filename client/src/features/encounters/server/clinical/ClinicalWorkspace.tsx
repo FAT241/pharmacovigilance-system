@@ -172,6 +172,28 @@ export function ClinicalWorkspace({
           <Button icon={<ArrowLeftOutlined />} onClick={onClose} disabled={busy}>
             Quay lại danh sách
           </Button>
+          {!editable && data && !data.record.dischargedAt && doctorId && (
+            <Button
+              type="primary"
+              style={{ background: '#059669', borderColor: '#059669' }}
+              loading={busy}
+              onClick={async () => {
+                setBusy(true)
+                try {
+                  const encounterPath = path.replace(/\/clinical$/, '')
+                  await requestApi(encounterPath + '/assign-doctor', token, 'PATCH')
+                  message.success('Đã chuyển quyền phụ trách bệnh nhân sang cho bạn!')
+                  setReload(v => v + 1)
+                } catch (err: any) {
+                  message.error(err instanceof Error ? err.message : 'Không chuyển được quyền phụ trách')
+                } finally {
+                  setBusy(false)
+                }
+              }}
+            >
+              Tiếp nhận phụ trách bệnh nhân này
+            </Button>
+          )}
           {editable && (
             <>
               <Button
